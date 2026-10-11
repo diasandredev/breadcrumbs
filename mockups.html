@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Breadcrumbs v2 — Mockups Interativos & Showcase de Telas</title>
+  <style>
+    :root {
+      --bg-page: #0c0c0e;
+      --bg-frame: #121215;
+      --bg-sidebar: #18181c;
+      --bg-surface: #1e1e24;
+      --bg-surface-elevated: #282830;
+      --bg-surface-hover: rgba(255, 255, 255, 0.06);
+      --field-bg: #141418;
+      
+      --text-main: #f4f4f6;
+      --text-muted: #a1a1aa;
+      --text-dim: #71717a;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.16);
+
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --accent-tint: rgba(59, 130, 246, 0.15);
+      --accent-text: #60a5fa;
+
+      --gold: #f59e0b;
+      --gold-tint: rgba(245, 158, 11, 0.15);
+
+      --multiday-color: #ec4899;
+      --multiday-tint: rgba(236, 72, 153, 0.14);
+      --multiday-border: rgba(236, 72, 153, 0.35);
+
+      --opencode-color: #10b981;
+      --opencode-tint: rgba(16, 185, 129, 0.15);
+
+      --claude-color: #d97706;
+      --claude-tint: rgba(217, 119, 6, 0.15);
+
+      --add: #10b981;
+      --del: #ef4444;
+
+      --cell-l0: #222228;
+      --cell-l1: #064e3b;
+      --cell-l2: #059669;
+      --cell-l3: #10b981;
+      --cell-l4: #34d399;
+
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    }
+
+    [data-theme="light"] {
+      --bg-page: #f1f5f9;
+      --bg-frame: #ffffff;
+      --bg-sidebar: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #f1f5f9;
+      --bg-surface-hover: rgba(0, 0, 0, 0.04);
+      --field-bg: #f8fafc;
+
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-dim: #94a3b8;
+      --border-subtle: rgba(0, 0, 0, 0.08);
+      --border-strong: rgba(0, 0, 0, 0.16);
+
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --accent-tint: rgba(37, 99, 235, 0.1);
+      --accent-text: #1d4ed8;
+
+      --gold: #d97706;
+      --gold-tint: rgba(217, 119, 6, 0.12);
+
+      --multiday-color: #db2777;
+      --multiday-tint: rgba(219, 39, 119, 0.12);
+      --multiday-border: rgba(219, 39, 119, 0.3);
+
+      --opencode-color: #059669;
+      --opencode-tint: rgba(5, 150, 105, 0.12);
+
+      --claude-color: #d97706;
+      --claude-tint: rgba(217, 119, 6, 0.12);
+
+      --add: #059669;
+      --del: #dc2626;
+
+      --cell-l0: #e2e8f0;
+      --cell-l1: #a7f3d0;
+      --cell-l2: #6ee7b7;
+      --cell-l3: #10b981;
+      --cell-l4: #059669;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 30px 20px 60px;
+      font-family: var(--font-sans);
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Page Header */
+    .showcase-header {
+      max-width: 1100px;
+      width: 100%;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .showcase-title h1 {
+      margin: 0 0 6px;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .showcase-title p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 13.5px;
+    }
+    .controls-bar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .theme-toggle-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* App Frame Simulation */
+    .app-window-frame {
+      max-width: 1100px;
+      width: 100%;
+      height: 720px;
+      background: var(--bg-frame);
+      border-radius: 12px;
+      border: 1px solid var(--border-strong);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Window Titlebar */
+    .window-titlebar {
+      height: 38px;
+      background: var(--bg-sidebar);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      justify-content: space-between;
+      user-select: none;
+    }
+    .window-controls {
+      display: flex;
+      gap: 7px;
+    }
+    .win-btn {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+    .win-close { background: #ff5f56; }
+    .win-min { background: #ffbd2e; }
+    .win-max { background: #27c93f; }
+    .window-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: -0.2px;
+    }
+
+    /* App Layout */
+    .app-body {
+      display: flex;
+      flex: 1;
+      height: calc(100% - 38px);
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      padding: 16px 12px;
+      flex-shrink: 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 6px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 14px;
+    }
+    .brand-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 10px var(--gold);
+    }
+    .brand-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      display: block;
+      color: var(--text-main);
+    }
+    .brand-sub {
+      font-size: 10.5px;
+      color: var(--text-dim);
+      display: block;
+    }
+    .nav-tabs {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: left;
+    }
+    .nav-btn:hover {
+      background: var(--bg-surface-hover);
+      color: var(--text-main);
+    }
+    .nav-btn.active {
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .sidebar-spacer { flex: 1; }
+    .sidebar-foot {
+      padding-top: 12px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .sync-action-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 7px 12px;
+      border-radius: 7px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .app-tag {
+      font-size: 10px;
+      color: var(--text-dim);
+      text-align: center;
+    }
+
+    /* Main Container */
+    .main-view-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px 40px;
+      background: var(--bg-frame);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: block; animation: fadeIn 0.15s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(3px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* View Titles */
+    .section-header { margin-bottom: 18px; }
+    .section-header h2 {
+      margin: 0 0 4px;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .section-sub {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    /* KPIs */
+    .totals-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .kpi-val {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .kpi-lbl {
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-dim);
+      font-weight: 600;
+    }
+
+    /* Heatmap */
+    .heatmap-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+    }
+    .heatmap-header {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .heatmap-title {
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .heatmap-sub {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+    .cal-months-row {
+      display: flex;
+      margin-left: 26px;
+      margin-bottom: 3px;
+      gap: 3px;
+      font-size: 9px;
+      color: var(--text-dim);
+    }
+    .cal-grid-row {
+      display: flex;
+      gap: 6px;
+      align-items: flex-start;
+    }
+    .cal-dow-col {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      font-size: 9px;
+      color: var(--text-dim);
+      width: 20px;
+    }
+    .cal-dow-col span { height: 10px; line-height: 10px; }
+    .cal-weeks-grid {
+      display: flex;
+      gap: 3px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+    .cal-week-col {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .cal-cell {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      background: var(--cell-l0);
+      cursor: pointer;
+      border: none;
+      padding: 0;
+    }
+    .cal-cell.l1 { background: var(--cell-l1); }
+    .cal-cell.l2 { background: var(--cell-l2); }
+    .cal-cell.l3 { background: var(--cell-l3); }
+    .cal-cell.l4 { background: var(--cell-l4); }
+    .cal-cell.selected { outline: 2px solid var(--accent); outline-offset: 1px; }
+    .cal-cell.today { box-shadow: 0 0 0 1px var(--gold); }
+    .heatmap-legend {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      margin-top: 8px;
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+
+    /* Day Toolbar */
+    .day-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .day-navigator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .day-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .btn-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .btn-text-ghost {
+      border: none;
+      background: transparent;
+      color: var(--accent-text);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 6px;
+    }
+    .toolbar-filters {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .select-filter {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 5px 12px;
+      color: var(--text-main);
+      font-size: 12px;
+    }
+    .btn-toggle {
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .btn-toggle.active {
+      background: var(--accent-tint);
+      border-color: var(--accent);
+      color: var(--accent-text);
+      font-weight: 600;
+    }
+
+    /* Session Cards */
+    .timeline-container {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .session-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    .session-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .header-tags {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .tag-badge {
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 5px;
+    }
+    .tag-badge.project {
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+    }
+    .tag-badge.agent.claude {
+      background: var(--claude-tint);
+      color: var(--claude-color);
+    }
+    .tag-badge.agent.opencode {
+      background: var(--opencode-tint);
+      color: var(--opencode-color);
+    }
+    .tag-badge.model {
+      background: var(--bg-surface-hover);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 10px;
+    }
+    .tag-badge.multiday {
+      background: var(--multiday-tint);
+      color: var(--multiday-color);
+      border: 1px solid var(--multiday-border);
+      box-shadow: 0 0 8px var(--multiday-tint);
+    }
+    .action-subtle-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .action-subtle-btn:hover { color: var(--text-main); }
+    .session-title {
+      margin: 0 0 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* Multi-Day Banner */
+    .multiday-notice {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--multiday-tint);
+      border: 1px solid var(--multiday-border);
+      border-radius: 6px;
+      padding: 6px 10px;
+      margin-bottom: 10px;
+      font-size: 11.5px;
+    }
+    .md-text strong { color: var(--multiday-color); }
+
+    .session-metrics {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .metric-chip {
+      background: var(--bg-surface-hover);
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .metric-chip strong { color: var(--text-main); }
+    .metric-chip.diff { font-family: var(--font-mono); }
+    .diff-add { color: var(--add); font-weight: 600; }
+    .diff-del { color: var(--del); font-weight: 600; }
+
+    .session-user-note {
+      display: flex;
+      gap: 6px;
+      background: var(--gold-tint);
+      border-left: 3px solid var(--gold);
+      border-radius: 0 6px 6px 0;
+      padding: 8px 10px;
+      margin-bottom: 10px;
+      font-size: 12px;
+    }
+    .session-commit-list {
+      list-style: none;
+      margin: 8px 0 0;
+      padding: 8px 0 0;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 11.5px;
+    }
+    .commit-hash {
+      font-family: var(--font-mono);
+      color: var(--gold);
+      font-size: 11px;
+      background: var(--gold-tint);
+      padding: 1px 4px;
+      border-radius: 3px;
+      margin-right: 6px;
+    }
+
+    /* Projects Grid */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+    }
+    .project-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 16px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+    .project-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    .project-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .project-name {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .badge-count {
+      font-size: 11px;
+      background: var(--bg-surface-hover);
+      padding: 2px 8px;
+      border-radius: 999px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .project-path {
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .project-card-stats {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    /* Reports Studio */
+    .reports-studio {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .range-selector {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .range-chip {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 999px;
+      padding: 5px 14px;
+      font-size: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .range-chip.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: transparent;
+      font-weight: 600;
+    }
+    .report-box {
+      flex: 1;
+      background: var(--field-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      margin-bottom: 14px;
+      overflow: hidden;
+      min-height: 380px;
+    }
+    .report-code-preview {
+      margin: 0;
+      padding: 16px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      line-height: 1.6;
+      color: var(--text-main);
+      white-space: pre-wrap;
+    }
+    .report-actions-strip {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .btn-enhance-ai {
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(236, 72, 153, 0.25);
+    }
+    .btn-copy-md {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      border-radius: 7px;
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Settings View */
+    .settings-view {
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .settings-section {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .settings-section h3 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .agent-status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .agent-status-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .agent-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .agent-name {
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .agent-desc {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+    .status-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+    .status-badge.active {
+      background: var(--opencode-tint);
+      color: var(--opencode-color);
+    }
+    .setting-toggle-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .switch-toggle {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 22px;
+    }
+    .switch-toggle input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: var(--cell-l0);
+      transition: 0.2s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.2s;
+      border-radius: 50%;
+    }
+    input:checked + .slider { background-color: var(--accent); }
+    input:checked + .slider:before { transform: translateX(18px); }
+
+    .ai-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .form-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .form-input {
+      background: var(--field-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 8px 10px;
+      color: var(--text-main);
+      font-size: 12.5px;
+      font-family: inherit;
+    }
+    .field-hint {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+    .ai-actions-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .btn-test {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .test-status.ok {
+      font-size: 12px;
+      color: var(--add);
+      font-weight: 500;
+    }
+    .btn-save {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 8px 20px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Annotation Callout Boxes */
+    .annotation-box {
+      max-width: 1100px;
+      width: 100%;
+      margin-top: 24px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 16px 20px;
+    }
+    .annotation-box h3 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .annotation-box ul {
+      margin: 0;
+      padding-left: 20px;
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+    .annotation-box li { margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+
+  <!-- Header Showcase -->
+  <header class="showcase-header">
+    <div class="showcase-title">
+      <h1>Breadcrumbs v2 — Showcase Interativo de Telas</h1>
+      <p>Mockups em alta fidelidade com as 4 telas principais do redesenho desktop.</p>
+    </div>
+    <div class="controls-bar">
+      <button class="theme-toggle-btn" onclick="toggleTheme()"> Alternar Tema Claro/Escuro</button>
+    </div>
+  </header>
+
+  <!-- Interactive Desktop Window Container -->
+  <div class="app-window-frame">
+    <!-- Window Bar -->
+    <div class="window-titlebar">
+      <div class="window-controls">
+        <span class="win-btn win-close"></span>
+        <span class="win-btn win-min"></span>
+        <span class="win-btn win-max"></span>
+      </div>
+      <span class="window-title">Breadcrumbs — Local Dev Diary (880 × 640)</span>
+      <div style="width: 40px;"></div>
+    </div>
+
+    <!-- Application Body -->
+    <div class="app-body">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-dot"></span>
+          <div class="brand-text">
+            <span class="brand-name">Breadcrumbs</span>
+            <span class="brand-sub">Local Dev Diary</span>
+          </div>
+        </div>
+
+        <nav class="nav-tabs">
+          <button class="nav-btn active" onclick="switchView('diary', this)">
+            <span>📖</span> Dev Diary
+          </button>
+          <button class="nav-btn" onclick="switchView('projects', this)">
+            <span>📁</span> Projects
+          </button>
+          <button class="nav-btn" onclick="switchView('reports', this)">
+            <span>📊</span> Reports
+          </button>
+          <button class="nav-btn" onclick="switchView('settings', this)">
+            <span>⚙️</span> Settings
+          </button>
+        </nav>
+
+        <div class="sidebar-spacer"></div>
+
+        <div class="sidebar-foot">
+          <button class="sync-action-btn" onclick="mockSync()">
+            <span id="sync-icon">↻</span> Sync Agents
+          </button>
+          <div class="app-tag">OpenCode + Claude Code</div>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="main-view-container">
+
+        <!-- ================= VIEW 1: DEV DIARY ================= -->
+        <section id="view-diary" class="view-panel active">
+          <!-- Totals Strip -->
+          <div class="totals-strip">
+            <div class="kpi-card">
+              <span class="kpi-val">28</span>
+              <span class="kpi-lbl">Sessions</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-val">19</span>
+              <span class="kpi-lbl">Active Days</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-val">5</span>
+              <span class="kpi-lbl">Day Streak</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-val">1.2M</span>
+              <span class="kpi-lbl">Tokens</span>
+            </div>
+          </div>
+
+          <!-- Heatmap Panel -->
+          <div class="heatmap-panel">
+            <div class="heatmap-header">
+              <span class="heatmap-title">Annual Activity</span>
+              <span class="heatmap-sub">52-week timeline</span>
+            </div>
+            <div class="cal-months-row">
+              <span style="width: 50px;">Nov</span>
+              <span style="width: 50px;">Dec</span>
+              <span style="width: 50px;">Jan</span>
+              <span style="width: 50px;">Feb</span>
+              <span style="width: 50px;">Mar</span>
+              <span style="width: 50px;">Apr</span>
+              <span style="width: 50px;">May</span>
+              <span style="width: 50px;">Jun</span>
+              <span style="width: 50px;">Jul</span>
+              <span style="width: 50px;">Aug</span>
+              <span style="width: 50px;">Sep</span>
+              <span style="width: 50px;">Oct</span>
+            </div>
+            <div class="cal-grid-row">
+              <div class="cal-dow-col">
+                <span></span>
+                <span>Mon</span>
+                <span></span>
+                <span>Wed</span>
+                <span></span>
+                <span>Fri</span>
+                <span></span>
+              </div>
+              <div class="cal-weeks-grid" id="heatmap-grid">
+                <!-- Injected via JavaScript for realistic random density -->
+              </div>
+            </div>
+            <div class="heatmap-legend">
+              <span>Less</span>
+              <span class="cal-cell l0"></span>
+              <span class="cal-cell l1"></span>
+              <span class="cal-cell l2"></span>
+              <span class="cal-cell l3"></span>
+              <span class="cal-cell l4"></span>
+              <span>More</span>
+            </div>
+          </div>
+
+          <!-- Day Toolbar -->
+          <div class="day-toolbar">
+            <div class="day-navigator">
+              <button class="btn-icon">‹</button>
+              <span class="day-title">Sunday, October 11, 2026</span>
+              <button class="btn-icon">›</button>
+              <button class="btn-text-ghost">Today</button>
+            </div>
+            <div class="toolbar-filters">
+              <select class="select-filter">
+                <option>All Projects (3)</option>
+                <option selected>breadcrumbs</option>
+                <option>mydev-cat</option>
+              </select>
+              <button class="btn-toggle active">Commits: on</button>
+            </div>
+          </div>
+
+          <!-- Timeline Container (Session Cards) -->
+          <div class="timeline-container">
+            <!-- MULTI-DAY SESSION CARD -->
+            <article class="session-card">
+              <div class="session-card-header">
+                <div class="header-tags">
+                  <span class="tag-badge project">breadcrumbs</span>
+                  <span class="tag-badge agent claude">Claude Code</span>
+                  <span class="tag-badge model">claude-3-7-sonnet</span>
+                  <span class="tag-badge multiday">✦ Multi-day (3d span)</span>
+                </div>
+                <button class="action-subtle-btn">✎ Edit Note</button>
+              </div>
+              <h4 class="session-title">Evolve Breadcrumbs to v2 desktop layout, GenPlat AI gateway & multi-day tracking</h4>
+              
+              <!-- Multi-day Notice Banner -->
+              <div class="multiday-notice">
+                <span>⏱</span>
+                <span class="md-text">
+                  <strong>Continued session:</strong> started on 2026-10-09 (14:20) and updated on 2026-10-11 (18:45).
+                </span>
+              </div>
+
+              <!-- Metrics -->
+              <div class="session-metrics">
+                <span class="metric-chip"><strong>24</strong> msgs</span>
+                <span class="metric-chip"><strong>148.5k</strong> in → <strong>32.8k</strong> out</span>
+                <span class="metric-chip diff">
+                  <span class="diff-add">+2,681</span> / <span class="diff-del">−608</span> lines across <strong>9</strong> files
+                </span>
+              </div>
+
+              <!-- User Note -->
+              <div class="session-user-note">
+                <span>📌</span>
+                <span>Refatoração completa do layout desktop em 880x640px e integração passiva de logs locais.</span>
+              </div>
+
+              <!-- Associated Commits -->
+              <ul class="session-commit-list">
+                <li>
+                  <code class="commit-hash">d49d0c5</code>
+                  <span>feat(v2): overhaul desktop UI, Claude Code sync, AI Gateway integration</span>
+                </li>
+                <li>
+                  <code class="commit-hash">b09542d</code>
+                  <span>feat(ai): support dynamic token file resolution and GenPlat headers</span>
+                </li>
+              </ul>
+            </article>
+
+            <!-- SINGLE DAY SESSION CARD -->
+            <article class="session-card">
+              <div class="session-card-header">
+                <div class="header-tags">
+                  <span class="tag-badge project">breadcrumbs</span>
+                  <span class="tag-badge agent opencode">OpenCode</span>
+                  <span class="tag-badge model">claude-fable-5-bedrock</span>
+                </div>
+                <button class="action-subtle-btn">+ Add Note</button>
+              </div>
+              <h4 class="session-title">Add SQLite migrations for custom session notes column</h4>
+              
+              <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
+                11:15 – 11:58 <span style="color: var(--text-dim);">(43m)</span>
+              </div>
+
+              <div class="session-metrics">
+                <span class="metric-chip"><strong>8</strong> msgs</span>
+                <span class="metric-chip"><strong>34.2k</strong> in → <strong>6.1k</strong> out</span>
+                <span class="metric-chip diff"><span class="diff-add">+45</span> / <span class="diff-del">−3</span> lines across <strong>2</strong> files</span>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- ================= VIEW 2: PROJECTS ================= -->
+        <section id="view-projects" class="view-panel">
+          <header class="section-header">
+            <h2>Monitored Projects</h2>
+            <span class="section-sub">Auto-discovered from OpenCode and Claude Code sessions</span>
+          </header>
+
+          <div class="projects-grid">
+            <div class="project-card">
+              <div class="project-card-top">
+                <h3 class="project-name">breadcrumbs</h3>
+                <span class="badge-count">19 sessions</span>
+              </div>
+              <p class="project-path">C:\Users\andre\Documents\Projects\breadcrumbs</p>
+              <div class="project-card-stats">
+                <span>945.8k tokens</span>
+                <span>Last active: 11/10/2026</span>
+              </div>
+            </div>
+
+            <div class="project-card">
+              <div class="project-card-top">
+                <h3 class="project-name">mydev-cat</h3>
+                <span class="badge-count">6 sessions</span>
+              </div>
+              <p class="project-path">C:\Users\andre\Documents\Projects\mydev-cat</p>
+              <div class="project-card-stats">
+                <span>218.4k tokens</span>
+                <span>Last active: 10/10/2026</span>
+              </div>
+            </div>
+
+            <div class="project-card">
+              <div class="project-card-top">
+                <h3 class="project-name">oh-my-ifood</h3>
+                <span class="badge-count">3 sessions</span>
+              </div>
+              <p class="project-path">C:\Users\andre\Documents\Projects\oh-my-ifood</p>
+              <div class="project-card-stats">
+                <span>88.2k tokens</span>
+                <span>Last active: 08/10/2026</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= VIEW 3: REPORTS ================= -->
+        <section id="view-reports" class="view-panel">
+          <header class="section-header">
+            <h2>Reports & Standup Studio</h2>
+            <span class="section-sub">Generate clean Markdown and Slack/Discord ready recaps</span>
+          </header>
+
+          <div class="range-selector">
+            <button class="range-chip active">Today</button>
+            <button class="range-chip">This Week</button>
+            <button class="range-chip">Last 7 Days</button>
+            <button class="range-chip">This Month</button>
+          </div>
+
+          <div class="report-box">
+            <pre class="report-code-preview"># Daily Report — Sunday, Oct 11 2026
+
+## breadcrumbs
+_2 sessions, 2 commits, 181.3k tokens_
+
+- Evolve Breadcrumbs to v2 desktop layout, GenPlat AI gateway & multi-day tracking (✦ multi-day · 3d span), +2681/−608 lines across 9 files
+  - d49d0c5: feat(v2): overhaul desktop UI, Claude Code sync, AI Gateway integration
+  - b09542d: feat(ai): support dynamic token file resolution and GenPlat headers
+- Add SQLite migrations for custom session notes column (43m), +45/−3 lines across 2 files
+
+---
+**Totals:** 2 sessions, 2 commits, 181.3k tokens</pre>
+          </div>
+
+          <div class="report-actions-strip">
+            <button class="btn-enhance-ai" onclick="alert('Requisição enviada ao GenPlat (/api/v2/chat/completions) com sucesso!')">
+              ✦ Enhance with AI Gateway
+            </button>
+            <button class="btn-copy-md" onclick="alert('Markdown copiado para o clipboard!')">
+              Copy Markdown
+            </button>
+          </div>
+        </section>
+
+        <!-- ================= VIEW 4: SETTINGS ================= -->
+        <section id="view-settings" class="view-panel">
+          <header class="section-header">
+            <h2>App & AI Configuration</h2>
+            <span class="section-sub">Manage local-first agent capture and AI Gateway connectivity</span>
+          </header>
+
+          <div class="settings-view">
+            <!-- Connected Agents -->
+            <section class="settings-section">
+              <h3>Connected Coding Agents</h3>
+              <div class="agent-status-row">
+                <div class="agent-info">
+                  <span class="agent-name">OpenCode</span>
+                  <span class="agent-desc">Local SQLite database watcher</span>
+                </div>
+                <span class="status-badge active">Auto-Detected</span>
+              </div>
+              <div class="agent-status-row">
+                <div class="agent-info">
+                  <span class="agent-name">Claude Code</span>
+                  <span class="agent-desc">Transcript watcher (~/.claude/projects) · 21 sessions</span>
+                </div>
+                <span class="status-badge active">Auto-Detected</span>
+              </div>
+            </section>
+
+            <!-- AI Gateway Section -->
+            <section class="settings-section">
+              <div class="setting-toggle-header">
+                <div>
+                  <h3 style="margin: 0;">AI Report Enhancements</h3>
+                  <span class="section-sub">Distill coding sessions and generate executive summaries</span>
+                </div>
+                <label class="switch-toggle">
+                  <input type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="ai-fields">
+                <div class="form-group">
+                  <label class="form-label">Provider Type</label>
+                  <select class="form-input">
+                    <option selected>Custom AI Gateway (OpenAI-compatible / GenPlat)</option>
+                    <option>Ollama (Local / Private)</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Gateway Endpoint Base URL</label>
+                  <input type="text" class="form-input" value="https://generative-ai-platform-development.ifoodcorp.com.br/api/v2">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Authentication Method</label>
+                  <select class="form-input">
+                    <option selected>Dynamic Token File (Zero restart, auto-rotated by daemon)</option>
+                    <option>Manual Static API Key / Bearer Token</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Token File Path</label>
+                  <input type="text" class="form-input" value="~/.config/tompero/requester_token">
+                  <span class="field-hint">
+                    Reads the live requester token from disk on every call. No restarts needed when tokens rotate.
+                  </span>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Model Identifier</label>
+                  <input type="text" class="form-input" value="claude-fable-5-bedrock" list="mock-models">
+                  <datalist id="mock-models">
+                    <option value="claude-fable-5-bedrock"></option>
+                    <option value="claude-3-7-sonnet"></option>
+                    <option value="gpt-4o"></option>
+                    <option value="llama3.3"></option>
+                  </datalist>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Reasoning Effort (Optional)</label>
+                  <select class="form-input">
+                    <option>Off (No thinking tokens)</option>
+                    <option>Low</option>
+                    <option selected>Medium</option>
+                    <option>High</option>
+                    <option>Extra High (xhigh)</option>
+                  </select>
+                </div>
+
+                <div class="ai-actions-bar">
+                  <button class="btn-test" onclick="mockTestConnection()">Test Connection</button>
+                  <span id="test-status" class="test-status ok">✓ Connected successfully (48 models detected from /model/info)</span>
+                </div>
+              </div>
+            </section>
+
+            <div style="display: flex; justify-content: flex-end;">
+              <button class="btn-save" onclick="alert('Configurações salvas no SQLite!')">Save Changes</button>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Architectural Annotations & Highlights -->
+  <footer class="annotation-box">
+    <h3>Destaques de Engenharia e UX Aplicados:</h3>
+    <ul>
+      <li><strong>Abordagem Sem Gamificação:</strong> Foco total em densidade de informação limpa, produtividade e métricas de engenharia (sem mascotes, badges infantis ou minigames).</li>
+      <li><strong>Visibilidade de Sessões Multi-Dias:</strong> Exibição do badge rosa <code>✦ Multi-day (Xd span)</code> e banner contextual com data de início e última atualização para evitar a ilusão de durações contínuas de 70+ horas.</li>
+      <li><strong>Heatmap Anual de 52 Semanas:</strong> Células com 5 níveis de intensidade e filtro reativo ao clique para navegar diretamente para os dias com maior foco.</li>
+      <li><strong>Zero Restart na Autenticação GenPlat:</strong> O token é lido dinamicamente a cada requisição HTTP de <code>~/.config/tompero/requester_token</code>, compatível com rotações de daemons locais.</li>
+      <li><strong>Multi-Superfície Transparente:</strong> Injeção unificada de <code>Authorization: Bearer</code>, <code>x-requester-token</code> e <code>x-genplat-user-agent</code>.</li>
+    </ul>
+  </footer>
+
+  <script>
+    // Tab switching inside mockup
+    function switchView(tabId, el) {
+      document.querySelectorAll('.view-panel').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('view-' + tabId).classList.add('active');
+      el.classList.add('active');
+    }
+
+    // Theme toggle
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const target = current === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', target);
+    }
+
+    // Populate Heatmap grid
+    const grid = document.getElementById('heatmap-grid');
+    for (let w = 0; w < 52; w++) {
+      const col = document.createElement('div');
+      col.className = 'cal-week-col';
+      for (let d = 0; d < 7; d++) {
+        const cell = document.createElement('button');
+        cell.className = 'cal-cell';
+        const rand = Math.random();
+        if (rand > 0.88) cell.classList.add('l4');
+        else if (rand > 0.7) cell.classList.add('l3');
+        else if (rand > 0.5) cell.classList.add('l2');
+        else if (rand > 0.25) cell.classList.add('l1');
+        else cell.classList.add('l0');
+
+        if (w === 51 && d === 6) cell.classList.add('today', 'selected');
+        col.appendChild(cell);
+      }
+      grid.appendChild(col);
+    }
+
+    // Sync button animation
+    function mockSync() {
+      const icon = document.getElementById('sync-icon');
+      icon.style.display = 'inline-block';
+      icon.style.transform = 'rotate(360deg)';
+      icon.style.transition = 'transform 0.8s ease';
+      setTimeout(() => {
+        icon.style.transform = 'none';
+        icon.style.transition = 'none';
+        alert('Sincronização concluída: 21 sessões do Claude Code e OpenCode atualizadas!');
+      }, 800);
+    }
+
+    function mockTestConnection() {
+      const status = document.getElementById('test-status');
+      status.innerText = 'Testando...';
+      setTimeout(() => {
+        status.innerText = '✓ Connected successfully (48 models detected from /model/info)';
+      }, 500);
+    }
+  </script>
+</body>
+</html>
