@@ -103,6 +103,12 @@ fn load_ai_settings(conn: &Connection) -> AiSettings {
     } else if let Some(u) = db::get_state(conn, "ollama_url") {
         s.url = u;
     }
+    if let Some(mode) = db::get_state(conn, "ai_auth_mode") {
+        s.auth_mode = mode;
+    }
+    if let Some(tf) = db::get_state(conn, "ai_token_file") {
+        s.token_file = Some(tf);
+    }
     if let Some(k) = db::get_state(conn, "ai_api_key") {
         s.api_key = Some(k);
     }
@@ -137,6 +143,10 @@ pub fn set_ai_settings(
     db::set_state(&conn, "ai_provider", settings.provider.trim());
     db::set_state(&conn, "ai_url", settings.url.trim());
     db::set_state(&conn, "ollama_url", settings.url.trim());
+    db::set_state(&conn, "ai_auth_mode", settings.auth_mode.trim());
+    if let Some(tf) = &settings.token_file {
+        db::set_state(&conn, "ai_token_file", tf.trim());
+    }
     if let Some(k) = &settings.api_key {
         db::set_state(&conn, "ai_api_key", k.trim());
     }

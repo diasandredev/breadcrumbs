@@ -1258,6 +1258,13 @@ input:checked + .slider:before {
   border-color: var(--accent);
 }
 
+.field-hint {
+  font-size: 11px;
+  color: var(--label-tertiary);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
 .ai-actions-bar {
   display: flex;
   align-items: center;

@@ -49,6 +49,8 @@ interface AiSettings {
   enabled: boolean;
   provider: string; // "gateway" | "ollama"
   url: string;
+  auth_mode: string; // "token_file" | "api_key"
+  token_file?: string;
   api_key?: string;
   model: string;
   reasoning?: string;
@@ -1036,7 +1038,7 @@ function SettingsView() {
                 class="form-input"
                 placeholder={
                   cfg.provider === "gateway"
-                    ? "https://your-gateway.internal/v1"
+                    ? "https://generative-ai-platform-development.ifoodcorp.com.br/api/v2"
                     : "http://localhost:11434"
                 }
                 value={cfg.url}
@@ -1050,21 +1052,65 @@ function SettingsView() {
             </div>
 
             {cfg.provider === "gateway" && (
-              <div class="form-group">
-                <label class="form-label">API Key / Bearer Token</label>
-                <input
-                  type="password"
-                  class="form-input"
-                  placeholder="Paste your gateway authentication key"
-                  value={cfg.api_key || ""}
-                  onChange={(e) =>
-                    setCfg({
-                      ...cfg,
-                      api_key: (e.target as HTMLInputElement).value,
-                    })
-                  }
-                />
-              </div>
+              <>
+                <div class="form-group">
+                  <label class="form-label">Authentication Method</label>
+                  <select
+                    class="form-input"
+                    value={cfg.auth_mode || "token_file"}
+                    onChange={(e) =>
+                      setCfg({
+                        ...cfg,
+                        auth_mode: (e.target as HTMLSelectElement).value,
+                      })
+                    }
+                  >
+                    <option value="token_file">
+                      Dynamic Token File (Zero restart, auto-rotated by daemon)
+                    </option>
+                    <option value="api_key">
+                      Manual Static API Key / Bearer Token
+                    </option>
+                  </select>
+                </div>
+
+                {cfg.auth_mode !== "api_key" ? (
+                  <div class="form-group">
+                    <label class="form-label">Token File Path</label>
+                    <input
+                      type="text"
+                      class="form-input"
+                      placeholder="~/.config/tompero/requester_token"
+                      value={cfg.token_file || "~/.config/tompero/requester_token"}
+                      onChange={(e) =>
+                        setCfg({
+                          ...cfg,
+                          token_file: (e.target as HTMLInputElement).value,
+                        })
+                      }
+                    />
+                    <span class="field-hint">
+                      Reads the live requester token from disk on every call. No restarts needed when tokens rotate.
+                    </span>
+                  </div>
+                ) : (
+                  <div class="form-group">
+                    <label class="form-label">API Key / Bearer Token</label>
+                    <input
+                      type="password"
+                      class="form-input"
+                      placeholder="Paste your gateway authentication key"
+                      value={cfg.api_key || ""}
+                      onChange={(e) =>
+                        setCfg({
+                          ...cfg,
+                          api_key: (e.target as HTMLInputElement).value,
+                        })
+                      }
+                    />
+                  </div>
+                )}
+              </>
             )}
 
             <div class="form-group">
@@ -1073,7 +1119,7 @@ function SettingsView() {
                 type="text"
                 list="model-suggestions"
                 class="form-input"
-                placeholder="e.g. gpt-4o, claude-3-7-sonnet, llama3.3"
+                placeholder="e.g. claude-3-7-sonnet, gpt-4o, llama3.3"
                 value={cfg.model}
                 onChange={(e) =>
                   setCfg({
@@ -1107,6 +1153,7 @@ function SettingsView() {
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
                 <option value="high">High</option>
+                <option value="xhigh">Extra High (xhigh)</option>
               </select>
             </div>
 
