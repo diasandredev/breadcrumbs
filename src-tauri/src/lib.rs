@@ -1,4 +1,5 @@
 pub mod ai;
+pub mod claude;
 pub mod commands;
 pub mod db;
 pub mod git;
@@ -17,8 +18,8 @@ use tauri::{
 
 const PANEL_LABEL: &str = "panel";
 const TRAY_ID: &str = "breadcrumbs-tray";
-const PANEL_WIDTH: f64 = 380.0;
-const PANEL_HEIGHT: f64 = 560.0;
+const PANEL_WIDTH: f64 = 880.0;
+const PANEL_HEIGHT: f64 = 640.0;
 
 fn ensure_panel(app: &AppHandle) -> tauri::Result<WebviewWindow> {
     if let Some(w) = app.get_webview_window(PANEL_LABEL) {
@@ -29,16 +30,16 @@ fn ensure_panel(app: &AppHandle) -> tauri::Result<WebviewWindow> {
         PANEL_LABEL,
         WebviewUrl::App("index.html".into()),
     )
-    .title("Breadcrumbs")
+    .title("Breadcrumbs — Dev Diary")
     .inner_size(PANEL_WIDTH, PANEL_HEIGHT)
-    .decorations(false)
-    .transparent(true)
-    .resizable(false)
+    .min_inner_size(680.0, 520.0)
+    .decorations(true)
+    .transparent(false)
+    .resizable(true)
     .visible(false)
-    .skip_taskbar(true)
-    .always_on_top(true)
+    .skip_taskbar(false)
+    .always_on_top(false)
     .accept_first_mouse(true)
-    .shadow(false)
     .build()?;
 
     #[cfg(target_os = "macos")]
@@ -182,13 +183,15 @@ pub fn run() {
             commands::generate_report,
             commands::get_settings,
             commands::set_ai_settings,
+            commands::list_ai_models,
             commands::list_ollama_models,
-            commands::enhance_report
+            commands::enhance_report,
+            commands::set_note
         ])
         .on_window_event(|window, event| {
             if window.label() == PANEL_LABEL {
                 if let WindowEvent::Focused(false) = event {
-                    window.hide().ok();
+                    // keep panel accessible
                 }
             }
         })

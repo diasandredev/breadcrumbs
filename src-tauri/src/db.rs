@@ -27,7 +27,8 @@ CREATE TABLE IF NOT EXISTS sessions (
     message_count INTEGER NOT NULL DEFAULT 0,
     started_at_ms INTEGER NOT NULL,
     ended_at_ms INTEGER NOT NULL,
-    synced_at_ms INTEGER NOT NULL
+    synced_at_ms INTEGER NOT NULL,
+    note TEXT NOT NULL DEFAULT ''
 );
 
 CREATE INDEX IF NOT EXISTS sessions_ended_idx ON sessions(ended_at_ms);
@@ -53,6 +54,9 @@ pub fn open_diary(app_data_dir: &Path) -> Result<Connection, rusqlite::Error> {
     let conn = Connection::open(app_data_dir.join("diary.db"))?;
     conn.execute_batch("PRAGMA journal_mode=WAL;")?;
     conn.execute_batch(MIGRATIONS)?;
+    
+    // safe migration for existing databases
+    let _ = conn.execute("ALTER TABLE sessions ADD COLUMN note TEXT NOT NULL DEFAULT ''", []);
     Ok(conn)
 }
 

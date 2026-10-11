@@ -19,6 +19,8 @@ pub struct ReportRow {
     pub deletions: i64,
     pub files_changed: i64,
     pub duration_ms: i64,
+    pub is_multiday: bool,
+    pub day_span: i64,
     pub commits: Vec<String>,
 }
 
@@ -91,20 +93,26 @@ pub fn build(conn: &Connection, from_ms: i64, to_ms: i64, title: &str) -> Result
     let mut items: Vec<ReportRow> = Vec::new();
     for (id, project, stitle, agent, model_id, tin, tout, msgs, adds, dels, files_changed, t0, t1) in &rows {
         let commits = commit_messages(conn, &proj_ids, project, t0 - WINDOW_MS, t1 + WINDOW_MS)?;
-                items.push(ReportRow {
-                    project: project.clone(),
-                    title: stitle.clone(),
-                    agent: agent.clone(),
-                    model_id: model_id.clone(),
-                    tokens_in: *tin,
-                    tokens_out: *tout,
-                    message_count: *msgs,
-                    additions: *adds,
-                    deletions: *dels,
-                    files_changed: *files_changed,
-                    duration_ms: t1 - t0,
-                    commits,
-                });
+        let dur = (t1 - t0).max(0);
+        let day_span = (dur / 86_400_000) + 1;
+        let is_multiday = day_span > 1;
+
+        items.push(ReportRow {
+            project: project.clone(),
+            title: stitle.clone(),
+            agent: agent.clone(),
+            model_id: model_id.clone(),
+            tokens_in: *tin,
+            tokens_out: *tout,
+            message_count: *msgs,
+            additions: *adds,
+            deletions: *dels,
+            files_changed: *files_changed,
+            duration_ms: dur,
+            is_multiday,
+            day_span,
+            commits,
+        });
         let _ = id;
     }
 
@@ -142,6 +150,8 @@ pub fn build(conn: &Connection, from_ms: i64, to_ms: i64, title: &str) -> Result
                     deletions: 0,
                     files_changed: 0,
                     duration_ms: 0,
+                    is_multiday: false,
+                    day_span: 1,
                     commits: vec![msg.clone()],
                 });
             }
@@ -229,7 +239,9 @@ fn render(title: &str, items: &[ReportRow]) -> Result<String, String> {
         for e in entries {
             if !e.title.is_empty() {
                 let mut line = format!("- {}", e.title);
-                if e.duration_ms > 0 {
+                if e.is_multiday {
+                    line.push_str(&format!(" (✦ multi-day · {}d span)", e.day_span));
+                } else if e.duration_ms > 0 {
                     line.push_str(&format!(" ({})", fmt_dur(e.duration_ms)));
                 }
                 if e.additions + e.deletions > 0 {

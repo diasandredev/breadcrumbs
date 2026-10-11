@@ -20,6 +20,11 @@ pub struct Session {
     pub message_count: i64,
     pub started_at_ms: i64,
     pub ended_at_ms: i64,
+    pub is_multiday: bool,
+    pub day_span: i64,
+    pub started_date: String,
+    pub ended_date: String,
+    pub note: Option<String>,
 }
 
 #[derive(Debug, Serialize)]

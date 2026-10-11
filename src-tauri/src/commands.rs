@@ -2,10 +2,12 @@ use std::collections::HashSet;
 use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use chrono::DateTime;
 use rusqlite::Connection;
 use tauri::{Emitter, Manager, State};
 
 use crate::ai::{self, AiSettings};
+use crate::claude;
 use crate::db;
 use crate::git;
 use crate::models::{Commit, Session, SessionWithCommits, SyncStats, TimelineData};
@@ -21,10 +23,25 @@ fn now_ms() -> i64 {
         .unwrap_or(0)
 }
 
+fn day_string(ms: i64) -> String {
+    let dt = DateTime::from_timestamp_millis(ms)
+        .unwrap_or_else(|| DateTime::from_timestamp(0, 0).unwrap());
+    dt.format("%Y-%m-%d").to_string()
+}
+
 #[tauri::command]
 pub fn sync_now(state: State<'_, AppState>) -> Result<SyncStats, String> {
     let conn = state.0.lock().map_err(|_| "db lock poisoned".to_string())?;
-    let stats = opencode::sync(&conn)?;
+    let mut stats = opencode::sync(&conn).unwrap_or(SyncStats {
+        new_sessions: 0,
+        updated_sessions: 0,
+    });
+    if let Ok(c_stats) = claude::sync(&conn) {
+        stats.new_sessions += c_stats.new_sessions;
+        stats.updated_sessions += c_stats.updated_sessions;
+    }
+    let _ = git::discover_repos(&conn);
+    let _ = git::sync_projects(&conn);
     Ok(stats)
 }
 
@@ -78,11 +95,24 @@ fn load_ai_settings(conn: &Connection) -> AiSettings {
     if db::get_state(conn, "ai_enabled").as_deref() == Some("1") {
         s.enabled = true;
     }
-    if let Some(u) = db::get_state(conn, "ollama_url") {
+    if let Some(p) = db::get_state(conn, "ai_provider") {
+        s.provider = p;
+    }
+    if let Some(u) = db::get_state(conn, "ai_url") {
+        s.url = u;
+    } else if let Some(u) = db::get_state(conn, "ollama_url") {
         s.url = u;
     }
-    if let Some(m) = db::get_state(conn, "ollama_model") {
+    if let Some(k) = db::get_state(conn, "ai_api_key") {
+        s.api_key = Some(k);
+    }
+    if let Some(m) = db::get_state(conn, "ai_model") {
         s.model = m;
+    } else if let Some(m) = db::get_state(conn, "ollama_model") {
+        s.model = m;
+    }
+    if let Some(r) = db::get_state(conn, "ai_reasoning") {
+        s.reasoning = Some(r);
     }
     s
 }
@@ -104,14 +134,36 @@ pub fn set_ai_settings(
         "ai_enabled",
         if settings.enabled { "1" } else { "0" },
     );
+    db::set_state(&conn, "ai_provider", settings.provider.trim());
+    db::set_state(&conn, "ai_url", settings.url.trim());
     db::set_state(&conn, "ollama_url", settings.url.trim());
+    if let Some(k) = &settings.api_key {
+        db::set_state(&conn, "ai_api_key", k.trim());
+    }
+    db::set_state(&conn, "ai_model", settings.model.trim());
     db::set_state(&conn, "ollama_model", settings.model.trim());
+    if let Some(r) = &settings.reasoning {
+        db::set_state(&conn, "ai_reasoning", r.trim());
+    }
     Ok(())
 }
 
 #[tauri::command]
+pub fn list_ai_models(settings: AiSettings) -> Result<Vec<String>, String> {
+    ai::list_models(&settings)
+}
+
+#[tauri::command]
 pub fn list_ollama_models(url: String) -> Result<Vec<String>, String> {
-    ai::list_models(url.trim())
+    let s = AiSettings {
+        enabled: true,
+        provider: "ollama".into(),
+        url,
+        api_key: None,
+        model: String::new(),
+        reasoning: None,
+    };
+    ai::list_models(&s)
 }
 
 #[tauri::command]
@@ -127,7 +179,22 @@ pub fn enhance_report(
         return Err("AI summaries are disabled in Settings".into());
     }
     let base = reports::build(&conn, from_ms, to_ms, &title)?;
-    ai::enhance_report(&cfg.url, &cfg.model, &base)
+    ai::enhance_report(&cfg, &base)
+}
+
+#[tauri::command]
+pub fn set_note(
+    session_id: String,
+    note: String,
+    state: State<'_, AppState>,
+) -> Result<(), String> {
+    let conn = state.0.lock().map_err(|_| "db lock poisoned".to_string())?;
+    conn.execute(
+        "UPDATE sessions SET note = ?1 WHERE id = ?2",
+        rusqlite::params![note.trim(), session_id],
+    )
+    .map_err(|e| e.to_string())?;
+    Ok(())
 }
 
 #[tauri::command]
@@ -142,7 +209,7 @@ pub fn get_timeline(
             "SELECT s.id, p.id, p.name, p.path, s.title, s.agent, s.model_provider, s.model_id,
                     s.tokens_input, s.tokens_output, s.tokens_reasoning, s.cost,
                     s.additions, s.deletions, s.files_changed, s.message_count,
-                    s.started_at_ms, s.ended_at_ms
+                    s.started_at_ms, s.ended_at_ms, s.note
              FROM sessions s JOIN projects p ON p.id = s.project_id
              WHERE s.ended_at_ms >= ?1
              ORDER BY s.ended_at_ms DESC",
@@ -155,6 +222,15 @@ pub fn get_timeline(
 
     let rows = stmt
         .query_map([since_ms], |r| {
+            let t0: i64 = r.get(16)?;
+            let t1: i64 = r.get(17)?;
+            let started_date = day_string(t0);
+            let ended_date = day_string(t1);
+            let is_multiday = started_date != ended_date;
+            let day_span = ((t1 - t0).max(0) / 86_400_000) + 1;
+            let note_str: String = r.get::<_, Option<String>>(18)?.unwrap_or_default();
+            let note = if note_str.is_empty() { None } else { Some(note_str) };
+
             Ok((
                 r.get::<_, String>(0)?,
                 r.get::<_, String>(1)?,
@@ -174,8 +250,13 @@ pub fn get_timeline(
                     deletions: r.get(13)?,
                     files_changed: r.get(14)?,
                     message_count: r.get(15)?,
-                    started_at_ms: r.get(16)?,
-                    ended_at_ms: r.get(17)?,
+                    started_at_ms: t0,
+                    ended_at_ms: t1,
+                    is_multiday,
+                    day_span,
+                    started_date,
+                    ended_date,
+                    note,
                 },
             ))
         })
@@ -226,14 +307,21 @@ pub fn get_timeline(
     })
 }
 
-/// Runs a background sync (OpenCode sessions + git commits) and notifies the
+/// Runs a background sync (OpenCode + Claude Code + git commits) and notifies the
 /// panel when done.
 pub fn spawn_sync(app: tauri::AppHandle) {
     std::thread::spawn(move || {
         let result = (|| -> Result<SyncStats, String> {
             let state: tauri::State<AppState> = app.state();
             let conn = state.0.lock().map_err(|_| "db lock poisoned".to_string())?;
-            let stats = opencode::sync(&conn)?;
+            let mut stats = opencode::sync(&conn).unwrap_or(SyncStats {
+                new_sessions: 0,
+                updated_sessions: 0,
+            });
+            if let Ok(c_stats) = claude::sync(&conn) {
+                stats.new_sessions += c_stats.new_sessions;
+                stats.updated_sessions += c_stats.updated_sessions;
+            }
             match git::discover_repos(&conn) {
                 Ok(n) if n > 0 => eprintln!("repo discovery: +{n} new repos"),
                 Err(e) => eprintln!("repo discovery failed: {e}"),
